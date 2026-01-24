@@ -62,11 +62,18 @@ export function isItemCountable(item: CS2EconomyItem) {
   return COUNTABLE_ITEM_TYPES.includes(item.type);
 }
 
+<<<<<<< HEAD
 export const baseStickerSlabId = 15200;
 export const newItemStartingId = 15367;
 export const newItemEndAt = 1774482426116;
 export const minStickerOffset = -100;
 export const maxStickerOffset = 100;
+=======
+export const newItemStartingId = 15256;
+export const newItemEndAt = 1767569897270;
+export const minStickerOffset = -2;
+export const maxStickerOffset = 2;
+>>>>>>> 13846af (update)
 export const stickerOffsetFactor = 0.001;
 export const seedStringMaxLen = String(CS2_MAX_SEED).length;
 export const wearStringMaxLen = String(CS2_WEAR_FACTOR).length;

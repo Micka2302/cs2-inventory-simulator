@@ -83,12 +83,15 @@ export const english = {
   EditorStatTrak: /* csgo_english.txt */"StatTrak™",
   EditorStickerEdit: /* csgo_english.txt */"Edit",
   EditorStickerRotation: /* csgo_english.txt */"Rotation",
+<<<<<<< HEAD
   EditorStickerSchema: "Schema",
   EditorStickerSchemaPlaceholder: "None",
+=======
+  EditorStickers: /* csgo_english.txt */"Stickers",
+>>>>>>> 13846af (update)
   EditorStickerWear: "Sticker wear",
   EditorStickerX: /* csgo_english.txt */"X Offset",
   EditorStickerY: /* csgo_english.txt */"Y Offset",
-  EditorStickers: /* csgo_english.txt */"Stickers",
   EditorWear: /* csgo_english.txt */"Wear",
   ErrorAlertFailedToAuth: "There was a problem starting the login process with Steam. Please try again.",
   ErrorAlertFailedToAuthTitle: "Could not connect to Steam",
