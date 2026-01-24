@@ -5,10 +5,14 @@
 
 import { assert } from "@ianlucas/cs2-lib";
 import dotenv from "dotenv";
+import path from "node:path";
 
 dotenv.config({
-  quiet: true
+  quiet: true,
+  path: path.resolve(process.cwd(), ".env")
 });
+
+console.log("DATABASE_URL (masked):", process.env.DATABASE_URL?.replace(/\/\/.*?:.*?@/, "//***:***@"));
 
 assert(process.env.DATABASE_URL, "DATABASE_URL must be set");
 export const DATABASE_URL = process.env.DATABASE_URL;
