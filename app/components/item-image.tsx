@@ -45,10 +45,11 @@ export function ItemImage({
       function fetchImage() {
         controller = new AbortController();
         fetch(url, { signal: controller?.signal })
-          .then(() => {
+          .then((response) => {
             controller = undefined;
             setLoaded(true);
-            if (!isServerContext) {
+            // Do not cache unsuccessful responses (e.g. 404) so the image can be retried later.
+            if (!isServerContext && response.ok) {
               cached.push(url);
             }
           })
