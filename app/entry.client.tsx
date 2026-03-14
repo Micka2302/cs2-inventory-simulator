@@ -25,19 +25,6 @@ function hydrate() {
     );
   }
 
-  const { itemTranslationMap } = clientGlobals;
-  if (
-    typeof itemTranslationMap !== "object" ||
-    itemTranslationMap === null ||
-    Object.keys(itemTranslationMap).length === 0
-  ) {
-    console.error(
-      "[InventorySimulator] Item translation map is missing or empty. " +
-        "This usually happens when your browser cached a stale translation " +
-        "file during a deployment. Please clear your browser cache and reload."
-    );
-  }
-
   CS2Economy.use({
     items: CS2_ITEMS,
     language: itemTranslationMap
