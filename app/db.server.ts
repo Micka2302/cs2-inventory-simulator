@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "./generated/prisma/client";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 
 import { DATABASE_URL } from "./env.server";
@@ -37,3 +37,4 @@ const prisma = singleton("prisma", () => {
 });
 
 export { prisma };
+
