@@ -24,7 +24,7 @@ export function EditorItemDisplay({
       />
       <div
         className={clsx(
-          "mb-2 text-center",
+          "mb-4 text-center",
           item.type === CS2ItemType.Agent && "mt-4"
         )}
       >

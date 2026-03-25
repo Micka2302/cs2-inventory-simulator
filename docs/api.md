@@ -22,16 +22,6 @@ type GetUserInventoryResponse = {
       equippedCT?: boolean;
       equippedT?: boolean;
       id: number;
-      keychains?: Record<
-        number,
-        {
-          id: number;
-          seed?: number;
-          x?: number;
-          y?: number;
-          z?: number;
-        }
-      >;
       nameTag?: string;
       patches?: Record<number, number>;
       seed?: number;
@@ -40,8 +30,6 @@ type GetUserInventoryResponse = {
         number,
         {
           id: number;
-          rotation?: number;
-          schema?: number;
           wear?: number;
           x?: number;
           y?: number;
@@ -64,7 +52,6 @@ type GetUserInventoryResponse = {
             {
               id: number;
               rotation?: number;
-              schema?: number;
               wear?: number;
               x?: number;
               y?: number;
@@ -85,7 +72,7 @@ type GetUserInventoryResponse = {
 ## Get user equipped items
 
 ```http
-GET https://inventory.cstrike.app/api/equipped/v4/{steamID64}.json
+GET https://inventory.cstrike.app/api/equipped/v3/{steamID64}.json
 ```
 
 ### Response
@@ -93,80 +80,51 @@ GET https://inventory.cstrike.app/api/equipped/v4/{steamID64}.json
 - Returns `200` (`application/json`).
 
 ```typescript
-interface MeleeEconItem {
+interface BaseEconItem {
   def: number;
-  hash: string;
-  nametag: string;
-  paint: number;
-  seed: number;
-  stattrak: number;
-  stickers: [];
-  uid: number;
-  wear: number;
-}
-interface GlovesEconItem {
-  def: number;
-  hash: string;
   paint: number;
   seed: number;
   wear: number;
 }
-interface WeaponEconItem {
-  def: number;
-  hash: string;
+interface WeaponEconItem extends BaseEconItem {
+  legacy: boolean;
   nametag: string;
-  paint: number;
-  seed: number;
   stattrak: number;
   stickers: {
     def: number;
     rotation?: number;
-    schema?: number;
     slot: number;
     wear: number;
     x?: number;
     y?: number;
   }[];
-  keychains: {
-    def: number;
-    seed: number;
-    slot: number;
-    sticker?: number;
-    x?: number;
-    y?: number;
-    z?: number;
-  }[];
   uid: number;
-  wear: number;
 }
-interface AgentEconItem {
+interface AgentItem {
+  def?: number;
+  model: string;
+  patches: number[];
+  vofallback: boolean;
+  vofemale: boolean;
+  voprefix: string;
+}
+interface MusicKitItem {
   def: number;
-  hash: string;
-  stickers: {
-    def: number;
-    slot: number;
-  }[];
-}
-interface MusicKitEconItem {
-  musicId: number;
   stattrak: number;
   uid: number;
 }
-interface CollectibleEconItem {
-  def: number;
-}
-interface GraffitiEconItem {
+interface GraffitiItem {
   def: number;
   tint: number;
 }
 type GetUserEquippedItemsResponse = {
-  agents?: Record<number, AgentEconItem>;
-  collectible?: CollectibleEconItem;
+  agents?: Record<number, AgentItem>;
   ctWeapons?: Record<number, WeaponEconItem>;
-  gloves?: Record<number, GlovesEconItem>;
-  graffiti?: GraffitiEconItem;
-  knives?: Record<number, MeleeEconItem>;
-  musicKit?: MusicKitEconItem;
+  gloves?: Record<number, BaseEconItem>;
+  graffiti?: GraffitiItem;
+  knives?: Record<number, WeaponEconItem>;
+  musicKit?: MusicKitItem;
+  pin?: number;
   tWeapons?: Record<number, WeaponEconItem>;
 };
 ```
@@ -223,8 +181,6 @@ type PostAddItemRequest = {
           string,
           {
             id: number;
-            rotation?: number | undefined;
-            schema?: number | undefined;
             wear?: number | undefined;
             x?: number | undefined;
             y?: number | undefined;
@@ -276,6 +232,7 @@ type PostAddContainerResponse = {
   altName?: string | undefined;
   base?: boolean | undefined;
   baseId?: number | undefined;
+  category?: string | undefined;
   category?: string | undefined;
   collection?: string | undefined;
   collectionDesc?: string | undefined;

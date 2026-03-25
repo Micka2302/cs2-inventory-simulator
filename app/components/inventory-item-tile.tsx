@@ -43,33 +43,19 @@ export function InventoryItemTile({
           <ItemImage className="w-36" item={item} />
         </div>
         {isNew && (
-          <div className="absolute top-px left-px bg-sky-600 p-1 text-[10px] font-bold text-sky-200 shadow-lg transition-all group-hover:text-white">
+          <div className="absolute top-px left-px bg-sky-600 px-1 py-1 text-[10px] font-bold text-sky-200 shadow-lg transition-all group-hover:text-white">
             {translate("InventoryItemNew")}
           </div>
         )}
-        {(inventoryItem?.stickers !== undefined ||
-          inventoryItem?.keychains !== undefined) && (
-          <div className="absolute bottom-0 left-0">
-            {inventoryItem?.keychains !== undefined && (
-              <div className="flex items-center p-1">
-                {inventoryItem.someKeychains().map(([slot, { id }]) => (
-                  <ItemImage
-                    className="h-5"
-                    item={CS2Economy.getById(id)}
-                    key={slot}
-                  />
-                ))}
-              </div>
-            )}
-            <div className="flex min-h-5 items-center p-1">
-              {inventoryItem.someStickers().map(([slot, { id }]) => (
-                <ItemImage
-                  className="h-5"
-                  item={CS2Economy.getById(id)}
-                  key={slot}
-                />
-              ))}
-            </div>
+        {inventoryItem?.stickers !== undefined && (
+          <div className="absolute bottom-0 left-0 flex items-center p-1">
+            {inventoryItem.someStickers().map(([slot, { id }]) => (
+              <ItemImage
+                className="h-5"
+                item={CS2Economy.getById(id)}
+                key={slot}
+              />
+            ))}
           </div>
         )}
         {inventoryItem?.patches !== undefined && (
@@ -98,7 +84,7 @@ export function InventoryItemTile({
         )}
         {onClick !== undefined && (
           <button
-            className="absolute top-0 left-0 size-full border-4 border-transparent transition-all hover:border-white"
+            className="absolute top-0 left-0 h-full w-full border-4 border-transparent transition-all hover:border-white"
             onClick={onClick}
           />
         )}
@@ -107,7 +93,7 @@ export function InventoryItemTile({
         className="h-1 shadow-sm shadow-black/50"
         style={{ backgroundColor: item.rarity }}
       />
-      <div className="font-display mt-1 text-[12px]/3 wrap-break-word text-white drop-shadow-[0_0_1px_rgba(0,0,0,1)]">
+      <div className="font-display mt-1 text-[12px] leading-3 wrap-break-word text-white drop-shadow-[0_0_1px_rgba(0,0,0,1)]">
         {has(model) && <div className="font-bold">{model}</div>}
         {has(name) && <div>{name}</div>}
       </div>

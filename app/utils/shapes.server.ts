@@ -5,7 +5,6 @@
 
 import { CS2BaseInventoryItem, CS2Economy } from "@ianlucas/cs2-lib";
 import { z, ZodObject } from "zod";
-import { baseStickerSlabId } from "./economy";
 import { baseInventoryItemProps, nonNegativeInt } from "./shapes";
 
 const clientInventoryItemProps = {
@@ -24,27 +23,22 @@ const syncInventoryItemProps = {
     .optional()
 };
 
-function allowed({
+function legit({
   id,
   nameTag,
-  stickers,
-  keychains
-}: Pick<CS2BaseInventoryItem, "id" | "nameTag" | "stickers" | "keychains">) {
-  // Free items can be stored if they have a nametag or stickers or keychains
+  stickers
+}: {
+  id: number;
+  nameTag?: string;
+  stickers?: CS2BaseInventoryItem["stickers"];
+}) {
+  // Free items can be stored if they have a nametag or stickers
   if (
     CS2Economy.getById(id).free &&
     nameTag === undefined &&
-    stickers === undefined &&
-    keychains === undefined
+    stickers === undefined
   ) {
     return false;
-  }
-  if (keychains !== undefined) {
-    for (const { id } of Object.values(keychains)) {
-      if (id === baseStickerSlabId) {
-        return false;
-      }
-    }
   }
   return true;
 }
@@ -52,12 +46,12 @@ function allowed({
 function refine(
   inventoryItem: z.infer<ZodObject<typeof syncInventoryItemProps>>
 ) {
-  if (!allowed(inventoryItem)) {
+  if (!legit(inventoryItem)) {
     return false;
   }
   if (inventoryItem.storage !== undefined) {
     for (const item of Object.values(inventoryItem.storage)) {
-      if (!allowed(item)) {
+      if (!legit(item)) {
         return false;
       }
     }
@@ -82,20 +76,6 @@ export const syncInventoryShape = z.object({
   items: z.record(z.string(), syncInventoryItemShape),
   version: nonNegativeInt
 });
-
-export const itemEditorAttributesShape = z
-  .object(clientInventoryItemProps)
-  .pick({
-    keychains: true,
-    nameTag: true,
-    patches: true,
-    seed: true,
-    stickers: true,
-    wear: true
-  })
-  .extend({
-    statTrak: z.boolean().optional()
-  });
 
 export type SyncInventoryItemShape = z.infer<typeof syncInventoryItemShape>;
 export type SyncInventoryShape = z.infer<typeof syncInventoryShape>;

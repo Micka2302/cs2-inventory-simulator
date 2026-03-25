@@ -38,7 +38,6 @@ export function StickerPicker({
   disabled,
   forItem,
   isHideStickerRotation,
-  isHideStickerSchema,
   isHideStickerWear,
   isHideStickerX,
   isHideStickerY,
@@ -49,7 +48,6 @@ export function StickerPicker({
   disabled?: boolean;
   forItem?: CS2EconomyItem;
   isHideStickerRotation?: boolean;
-  isHideStickerSchema?: boolean;
   isHideStickerWear?: boolean;
   isHideStickerX?: boolean;
   isHideStickerY?: boolean;
@@ -66,7 +64,6 @@ export function StickerPicker({
   const categories = useMemo(() => CS2Economy.getStickerCategories(), []);
   const [appliedStickerData, setAppliedStickerData] = useState({
     rotation: 0,
-    schema: -1,
     wear: 0,
     x: 0,
     y: 0
@@ -75,7 +72,6 @@ export function StickerPicker({
   const [isEditing, setIsEditing] = useState(false);
   const canEditStickerAttributes =
     !isHideStickerRotation &&
-    !isHideStickerSchema &&
     !isHideStickerWear &&
     !isHideStickerX &&
     !isHideStickerY;
@@ -88,10 +84,9 @@ export function StickerPicker({
 
   function handleClickEditSlot(index: number) {
     return function handleClickSlot() {
-      const { id, rotation, schema, wear, x, y } = value[index];
+      const { id, rotation, wear, x, y } = value[index];
       setAppliedStickerData({
         rotation: rotation ?? 0,
-        schema: schema ?? -1,
         wear: wear ?? 0,
         x: x ?? 0,
         y: y ?? 0
@@ -121,10 +116,6 @@ export function StickerPicker({
       [ensure(activeIndex)]: {
         id: selected.id,
         rotation: appliedStickerData.rotation || undefined,
-        schema:
-          appliedStickerData.schema !== -1
-            ? appliedStickerData.schema
-            : undefined,
         wear: appliedStickerData.wear || undefined,
         x: appliedStickerData.x || undefined,
         y: appliedStickerData.y || undefined
@@ -184,7 +175,7 @@ export function StickerPicker({
             <div className="relative aspect-256/192" key={index}>
               <button
                 disabled={disabled}
-                className="absolute size-full cursor-default overflow-hidden bg-neutral-950/40"
+                className="absolute h-full w-full cursor-default overflow-hidden bg-neutral-950/40"
                 onClick={handleClickSlot(index)}
               >
                 {item !== undefined ? (
@@ -200,7 +191,7 @@ export function StickerPicker({
                   </div>
                 )}
                 {!disabled && (
-                  <div className="absolute top-0 left-0 size-full border-2 border-transparent hover:border-blue-500/50" />
+                  <div className="absolute top-0 left-0 h-full w-full border-2 border-transparent hover:border-blue-500/50" />
                 )}
               </button>
               {item !== undefined && !disabled && (
@@ -217,7 +208,7 @@ export function StickerPicker({
         })}
       </div>
       <Modal
-        className="w-135 pb-1"
+        className="w-[540px] pb-1"
         hidden={activeIndex === undefined || isEditing}
         blur
       >
@@ -235,7 +226,7 @@ export function StickerPicker({
           />
           <IconSelect
             icon={faTag}
-            className="w-42"
+            className="w-[168px]"
             onChange={setCategory}
             options={categories}
             placeholder={translate("StickerPickerFilterPlaceholder")}
@@ -250,7 +241,7 @@ export function StickerPicker({
         <ItemBrowser items={filtered} onClick={handleSelectSticker} />
       </Modal>
       {selected !== undefined && (
-        <Modal className="w-105">
+        <Modal className="w-[420px]">
           <ModalHeader
             title={translate("EditorConfirmPick")}
             onClose={handleCloseSelectModal}
@@ -260,11 +251,6 @@ export function StickerPicker({
               slot={activeIndex}
               className="px-4"
               forItem={forItem}
-              isHideStickerRotation={isHideStickerRotation}
-              isHideStickerSchema={isHideStickerSchema}
-              isHideStickerWear={isHideStickerWear}
-              isHideStickerX={isHideStickerX}
-              isHideStickerY={isHideStickerY}
               item={selected}
               onChange={setAppliedStickerData}
               stickers={value}

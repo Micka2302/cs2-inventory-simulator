@@ -7,15 +7,6 @@ import { CS2Economy, CS2ItemType } from "@ianlucas/cs2-lib";
 
 export const ECONOMY_ITEM_FILTERS = [
   {
-    category: "",
-    hasModel: false,
-    icon: "new",
-    isFree: false,
-    isNewItems: true as const,
-    label: "New" as const,
-    type: CS2ItemType.Stub
-  },
-  {
     category: "secondary",
     hasModel: true,
     icon: "pistol",

@@ -11,23 +11,7 @@ import { inventoryMaxItems, inventoryStorageUnitMaxItems } from "./rule.server";
 
 export async function getUserInventory(userId: string) {
   return (
-    (
-      await prisma.user.findFirst({
-        select: { inventory: true },
-        where: { id: userId }
-      })
-    )?.inventory ?? null
-  );
-}
-
-export async function getUserInventoryVersion(userId: string) {
-  return (
-    (
-      await prisma.user.findFirst({
-        select: { inventoryVersion: true },
-        where: { id: userId }
-      })
-    )?.inventoryVersion ?? null
+    (await prisma.user.findFirst({ where: { id: userId } }))?.inventory ?? null
   );
 }
 
@@ -89,11 +73,7 @@ export async function existsUser(userId: string) {
   );
 }
 
-export async function updateUserInventory(
-  userId: string,
-  inventory: string,
-  inventoryVersion?: number
-) {
+export async function updateUserInventory(userId: string, inventory: string) {
   const syncedAt = new Date();
   return await prisma.user.update({
     select: {
@@ -101,7 +81,6 @@ export async function updateUserInventory(
     },
     data: {
       inventory,
-      inventoryVersion,
       syncedAt
     },
     where: {

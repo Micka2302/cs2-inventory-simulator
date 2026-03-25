@@ -4,30 +4,22 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {
-  CS2_ITEMS,
-  CS2_MAX_KEYCHAIN_SEED,
-  CS2_MAX_SEED,
-  CS2_MAX_STICKER_ROTATION,
-  CS2_MAX_STICKER_WEAR,
-  CS2_MAX_STICKERS,
-  CS2_MIN_KEYCHAIN_SEED,
-  CS2_MIN_STICKER_ROTATION,
-  CS2_MIN_STICKER_WEAR,
-  CS2_STICKER_WEAR_FACTOR,
-  CS2_WEAR_FACTOR,
   CS2Economy,
   CS2EconomyItem,
   CS2ItemTranslationByLanguage,
   CS2ItemType,
   CS2ItemTypeValues,
   CS2RarityColor,
+  CS2_ITEMS,
+  CS2_MAX_SEED,
+  CS2_MAX_STICKER_ROTATION,
+  CS2_MAX_STICKER_WEAR,
+  CS2_MIN_STICKER_ROTATION,
+  CS2_MIN_STICKER_WEAR,
+  CS2_STICKER_WEAR_FACTOR,
+  CS2_WEAR_FACTOR,
   fail
 } from "@ianlucas/cs2-lib";
-import {
-  CS2_PREVIEW_URL,
-  isCommandInspect,
-  isSteamInspectLink
-} from "@ianlucas/cs2-lib-inspect";
 
 export const COUNTABLE_ITEM_TYPES: CS2ItemTypeValues[] = [
   CS2ItemType.Container,
@@ -62,25 +54,15 @@ export function isItemCountable(item: CS2EconomyItem) {
   return COUNTABLE_ITEM_TYPES.includes(item.type);
 }
 
-<<<<<<< HEAD
-export const baseStickerSlabId = 15200;
 export const newItemStartingId = 15367;
 export const newItemEndAt = 1774482426116;
-export const minStickerOffset = -100;
-export const maxStickerOffset = 100;
-=======
-export const newItemStartingId = 15256;
-export const newItemEndAt = 1767569897270;
 export const minStickerOffset = -2;
 export const maxStickerOffset = 2;
->>>>>>> 13846af (update)
 export const stickerOffsetFactor = 0.001;
 export const seedStringMaxLen = String(CS2_MAX_SEED).length;
 export const wearStringMaxLen = String(CS2_WEAR_FACTOR).length;
 export const stickerWearStringMaxLen = String(CS2_STICKER_WEAR_FACTOR).length;
-const stickerOffsetDecimalPlaces = String(stickerOffsetFactor).length - 2;
-export const stickerOffsetStringMaxLen =
-  String(maxStickerOffset).length + 1 + stickerOffsetDecimalPlaces;
+export const stickerOffsetStringMaxLen = String(stickerOffsetFactor).length;
 export const stickerRotationStringMaxLen = String(
   CS2_MAX_STICKER_ROTATION
 ).length;
@@ -102,12 +84,12 @@ export function validateStickerWear(wear: number) {
 }
 
 export function stickerOffsetToString(offset: number) {
-  return offset.toFixed(stickerOffsetDecimalPlaces);
+  return offset.toFixed(stickerOffsetStringMaxLen - 2);
 }
 
 export function validateStickerOffset(offset: number) {
   return (
-    Number(offset.toFixed(stickerOffsetDecimalPlaces)) === offset &&
+    String(offset).length <= stickerOffsetStringMaxLen + (offset > 0 ? 0 : 1) &&
     offset >= minStickerOffset &&
     offset <= maxStickerOffset
   );
@@ -118,26 +100,6 @@ export function validateStickerRotation(rotation: number) {
     String(rotation).length <= stickerRotationStringMaxLen &&
     rotation >= CS2_MIN_STICKER_ROTATION &&
     rotation <= CS2_MAX_STICKER_ROTATION
-  );
-}
-
-export const stickerSchemaStringMaxLen = String(CS2_MAX_STICKERS - 1).length;
-
-export function validateStickerSchema(schema: number, item?: CS2EconomyItem) {
-  return (
-    Number.isInteger(schema) &&
-    schema >= 0 &&
-    schema <= (item?.getStickerSlotCount() ?? CS2_MAX_STICKERS) - 1
-  );
-}
-
-export const keychainSeedStringMaxLen = String(CS2_MAX_KEYCHAIN_SEED).length;
-
-export function validateKeychainSeed(seed: number) {
-  return (
-    Number.isInteger(seed) &&
-    seed >= CS2_MIN_KEYCHAIN_SEED &&
-    seed <= CS2_MAX_KEYCHAIN_SEED
   );
 }
 
@@ -217,20 +179,4 @@ export function unlockNonSpecialItem(container: CS2EconomyItem) {
 
 export function isNewItem(item: CS2EconomyItem) {
   return item.id >= newItemStartingId && newItemEndAt > Date.now();
-}
-
-export function normalizeInspectLink(link: string) {
-  const parts = link.split("csgo_econ_action_preview");
-  if (parts.length !== 2) {
-    return link;
-  }
-  return (CS2_PREVIEW_URL.replace("%20", "") + parts[1]).replace(" ", "%20");
-}
-
-export function isValidInspectLink(link: string) {
-  return (
-    isCommandInspect(link) ||
-    isSteamInspectLink(link) ||
-    link.startsWith(CS2_PREVIEW_URL)
-  );
 }

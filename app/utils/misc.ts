@@ -19,6 +19,14 @@ export function safeParseJson(json: string) {
   }
 }
 
+export function deleteEmptyProps<T extends object>(obj: T) {
+  for (const key of Object.keys(obj)) {
+    if (obj[key as keyof T] === undefined) {
+      delete obj[key as keyof T];
+    }
+  }
+}
+
 export function has(str?: string) {
   return (str?.length ?? 0) > 0;
 }

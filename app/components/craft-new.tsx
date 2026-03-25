@@ -21,17 +21,11 @@ export function CraftNew({
 }) {
   const translate = useTranslate();
   const {
-    craftAllowKeychainSeed,
-    craftAllowKeychains,
-    craftAllowKeychainX,
-    craftAllowKeychainY,
-    craftAllowKeychainZ,
     craftAllowNametag,
     craftAllowPatches,
     craftAllowSeed,
     craftAllowStatTrak,
     craftAllowStickerRotation,
-    craftAllowStickerSchema,
     craftAllowStickers,
     craftAllowStickerWear,
     craftAllowStickerX,
@@ -58,23 +52,15 @@ export function CraftNew({
   const isHideStatTrak = !craftAllowStatTrak;
   const isHideWear = !craftAllowWear;
   const isHideStickerRotation = !craftAllowStickerRotation;
-  const isHideStickerSchema = !craftAllowStickerSchema;
   const isHideStickerWear = !craftAllowStickerWear;
   const isHideStickerX = !craftAllowStickerX;
   const isHideStickerY = !craftAllowStickerY;
-  const isHideKeychainSeed = !craftAllowKeychainSeed;
-  const isHideKeychainX = !craftAllowKeychainX;
-  const isHideKeychainY = !craftAllowKeychainY;
-  const isHideKeychainZ = !craftAllowKeychainZ;
 
   const isHidePatches =
     !craftAllowPatches || craftHideType.includes(CS2ItemType.Patch);
 
   const isHideStickers =
     !craftAllowStickers || craftHideType.includes(CS2ItemType.Sticker);
-
-  const isHideKeychains =
-    !craftAllowKeychains || craftHideType.includes(CS2ItemType.Keychain);
 
   function handleSubmit() {
     if (attributes !== undefined) {
@@ -99,24 +85,17 @@ export function CraftNew({
     <>
       <ItemEditor
         className="px-4"
-        isHideKeychainSeed={isHideKeychainSeed}
-        isHideKeychains={isHideKeychains}
-        isHideKeychainX={isHideKeychainX}
-        isHideKeychainY={isHideKeychainY}
-        isHideKeychainZ={isHideKeychainZ}
         isHideNameTag={isHideNameTag}
         isHidePatches={isHidePatches}
         isHideSeed={isHideSeed}
         isHideStatTrak={isHideStatTrak}
         isHideStickerRotation={isHideStickerRotation}
-        isHideStickerSchema={isHideStickerSchema}
         isHideStickers={isHideStickers}
         isHideStickerWear={isHideStickerWear}
         isHideStickerX={isHideStickerX}
         isHideStickerY={isHideStickerY}
         isHideWear={isHideWear}
         item={item}
-        keychainFilter={filterStickerOrPatch}
         maxQuantity={maxQuantity}
         onChange={setAttributes}
         patchFilter={filterStickerOrPatch}

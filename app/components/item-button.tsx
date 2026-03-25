@@ -50,12 +50,12 @@ export function ItemButton({
         clickable &&
           "relative cursor-default overflow-hidden hover:bg-black/25 active:bg-black/30",
         !bigger && "block h-16 w-full pr-4 pl-0.5",
-        bigger && "flex size-full items-center justify-center"
+        bigger && "flex h-full w-full items-center justify-center"
       )}
     >
       <div
         className={clsx(
-          "group relative truncate",
+          "group relative overflow-hidden text-ellipsis whitespace-nowrap",
           !bigger && "flex items-center"
         )}
       >
@@ -76,7 +76,7 @@ export function ItemButton({
           )}
         >
           {model !== "" && (
-            <div className="text-xs/3 text-neutral-400">
+            <div className="text-xs leading-3 text-neutral-400">
               <TextSlider text={model} />
             </div>
           )}
@@ -85,14 +85,14 @@ export function ItemButton({
           </div>
           {showAltname && item.altName !== undefined && (
             <TextSlider
-              className="text-sm/3 text-neutral-200"
+              className="text-sm leading-3 text-neutral-200"
               text={item.altName}
             />
           )}
         </div>
         {!hideNewItemLabel && isNewItem(item) && (
           <div
-            className="absolute bottom-1.5 left-1.5 animate-pulse rounded text-[0.5rem] font-bold uppercase"
+            className="absolute bottom-1.5 left-1.5 rounded bg-sky-400/40 px-1 text-[0.5rem] font-extrabold text-white uppercase backdrop-blur"
             children={translate("InventoryItemNew")}
           />
         )}

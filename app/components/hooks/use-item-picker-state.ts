@@ -5,7 +5,6 @@
 
 import { CS2EconomyItem } from "@ianlucas/cs2-lib";
 import { useMemo, useState } from "react";
-import { isNewItem } from "~/utils/economy";
 import {
   ECONOMY_ITEM_FILTERS,
   EconomyItemFilter,
@@ -24,21 +23,8 @@ export function useItemPickerState({
 }) {
   const isItemCraftable = useIsItemCraftable();
   const categoryFilter = useCraftFilterRules();
-  const newItems = useMemo(
-    () => getAllPaidItems().filter(isNewItem).filter(isItemCraftable),
-    []
-  );
-  const categories = useMemo(() => {
-    return ECONOMY_ITEM_FILTERS.filter((filter) => {
-      if (filter.isNewItems && newItems.length === 0) {
-        return false;
-      }
-      return categoryFilter(filter);
-    });
-  }, []);
-  const [filter, setFilter] = useState(
-    categories[categories[0].isNewItems ? 1 : 0]
-  );
+  const categories = ECONOMY_ITEM_FILTERS.filter(categoryFilter);
+  const [filter, setFilter] = useState(categories[0]);
   const [model, setModel] = useState<string | undefined>();
   const [query, setQuery] = useInput("");
 
@@ -76,19 +62,15 @@ export function useItemPickerState({
   }
 
   const items = useMemo(() => {
-    let items: CS2EconomyItem[];
-    if (filter.isNewItems) {
-      items = newItems.filter(filterItem);
-    } else {
-      items = (
-        model === undefined ? getBaseItems(filter) : getPaidItems(filter, model)
-      ).filter(filterItem);
-      if (items.length === 0 && query.length >= 3) {
-        items = getAllPaidItems().filter(filterItem);
-      }
-      items = items.filter(isItemCraftable);
+    let items = (
+      model === undefined ? getBaseItems(filter) : getPaidItems(filter, model)
+    ).filter(filterItem);
+    if (items.length === 0 && query.length >= 3) {
+      items = getAllPaidItems().filter(filterItem);
     }
-    return items.sort((a, b) => a.name.localeCompare(b.name));
+    return items
+      .filter(isItemCraftable)
+      .sort((a, b) => a.name.localeCompare(b.name));
   }, [filter, model, query]);
 
   const ignoreRarityColor = model === undefined && filter.hasModel;

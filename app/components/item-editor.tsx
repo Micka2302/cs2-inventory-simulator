@@ -3,8 +3,6 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { faArrowRotateLeft } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   CS2_MIN_SEED,
   CS2_MIN_WEAR,
@@ -23,20 +21,16 @@ import {
 } from "~/utils/economy";
 import { hasKeys } from "~/utils/misc";
 import { useTranslate } from "./app-context";
-import { ButtonWithTooltip } from "./button-with-tooltip";
 import { EditorInput } from "./editor-input";
 import { EditorItemDisplay } from "./editor-item-display";
 import { EditorLabel } from "./editor-label";
 import { EditorStepRangeWithInput } from "./editor-step-range-with-input";
 import { EditorToggle } from "./editor-toggle";
 import { useKeyValues } from "./hooks/use-key-values";
-import { KeychainPicker } from "./keychain-picker";
-import { confirm } from "./modal-generic";
 import { PatchPicker } from "./patch-picker";
 import { StickerPicker } from "./sticker-picker";
 
 export interface ItemEditorAttributes {
-  keychains?: CS2BaseInventoryItem["keychains"];
   nameTag?: string;
   patches?: CS2BaseInventoryItem["patches"];
   quantity: number;
@@ -50,24 +44,17 @@ export function ItemEditor({
   className,
   defaultQuantity,
   isDisabled,
-  isHideKeychainSeed,
-  isHideKeychains,
-  isHideKeychainX,
-  isHideKeychainY,
-  isHideKeychainZ,
   isHideNameTag,
   isHidePatches,
   isHideSeed,
   isHideStatTrak,
   isHideStickerRotation,
-  isHideStickerSchema,
   isHideStickers,
   isHideStickerWear,
   isHideStickerX,
   isHideStickerY,
   isHideWear,
   item,
-  keychainFilter,
   maxQuantity,
   onChange,
   patchFilter,
@@ -78,23 +65,16 @@ export function ItemEditor({
   item: CS2InventoryItem | CS2EconomyItem;
   maxQuantity?: number;
   isDisabled?: boolean;
-  isHideKeychainSeed?: boolean;
-  isHideKeychains?: boolean;
-  isHideKeychainX?: boolean;
-  isHideKeychainY?: boolean;
-  isHideKeychainZ?: boolean;
   isHideNameTag?: boolean;
   isHidePatches?: boolean;
   isHideSeed?: boolean;
   isHideStatTrak?: boolean;
   isHideStickerRotation?: boolean;
-  isHideStickerSchema?: boolean;
   isHideStickers?: boolean;
   isHideStickerWear?: boolean;
   isHideStickerX?: boolean;
   isHideStickerY?: boolean;
   isHideWear?: boolean;
-  keychainFilter?: (item: CS2EconomyItem) => boolean;
   onChange?: (data: ItemEditorAttributes) => void;
   stickerFilter?: (item: CS2EconomyItem) => boolean;
   patchFilter?: (item: CS2EconomyItem) => boolean;
@@ -104,7 +84,6 @@ export function ItemEditor({
   const defaults = item instanceof CS2InventoryItem ? item.asBase() : undefined;
 
   const hasQuantity = !isDisabled && isItemCountable(item);
-  const hasKeychains = !isHideKeychains && item.hasKeychains();
   const hasStickers = !isHideStickers && item.hasStickers();
   const hasPatches = !isHidePatches && item.hasPatches();
   const hasNameTag = !isHideNameTag && item.hasNametag();
@@ -117,7 +96,6 @@ export function ItemEditor({
   const translate = useTranslate();
 
   const attributes = useKeyValues({
-    keychains: defaults?.keychains ?? {},
     nameTag: defaults?.nameTag ?? "",
     patches: defaults?.patches ?? {},
     quantity: defaultQuantity ?? 1,
@@ -127,25 +105,8 @@ export function ItemEditor({
     wear: defaults?.wear ?? minimumWear
   });
 
-  async function handleReset() {
-    if (
-      await confirm({
-        titleText: translate("EditorResetConfirmTitle"),
-        bodyText: translate("EditorResetConfirm"),
-        cancelText: translate("GenericNo"),
-        confirmText: translate("GenericYes")
-      })
-    ) {
-      attributes.reset();
-    }
-  }
-
   useEffect(() => {
     onChange?.({
-      keychains:
-        hasKeychains && hasKeys(attributes.value.keychains)
-          ? attributes.value.keychains
-          : undefined,
       nameTag: hasNameTag
         ? attributes.value.nameTag.length > 0
           ? attributes.value.nameTag
@@ -178,7 +139,7 @@ export function ItemEditor({
   }, [attributes.value]);
 
   return (
-    <div className={clsx("m-auto text-sm select-none", className)}>
+    <div className={clsx("m-auto select-none", className)}>
       <EditorItemDisplay item={item} wear={attributes.value.wear} />
       <div className="space-y-1.5">
         {hasStickers && (
@@ -187,7 +148,6 @@ export function ItemEditor({
               disabled={isDisabled}
               forItem={item}
               isHideStickerRotation={isHideStickerRotation}
-              isHideStickerSchema={isHideStickerSchema}
               isHideStickerWear={isHideStickerWear}
               isHideStickerX={isHideStickerX}
               isHideStickerY={isHideStickerY}
@@ -204,20 +164,6 @@ export function ItemEditor({
               disabled={isDisabled}
               value={attributes.value.patches}
               onChange={attributes.update("patches")}
-            />
-          </EditorLabel>
-        )}
-        {hasKeychains && (
-          <EditorLabel block label={translate("EditorKeychains")}>
-            <KeychainPicker
-              disabled={isDisabled}
-              isHideKeychainSeed={isHideKeychainSeed}
-              isHideKeychainX={isHideKeychainX}
-              isHideKeychainY={isHideKeychainY}
-              isHideKeychainZ={isHideKeychainZ}
-              keychainFilter={keychainFilter}
-              onChange={attributes.update("keychains")}
-              value={attributes.value.keychains}
             />
           </EditorLabel>
         )}
@@ -313,15 +259,6 @@ export function ItemEditor({
             />
           </EditorLabel>
         )}
-        <div className="flex justify-end">
-          <ButtonWithTooltip
-            tooltip={translate("EditorReset")}
-            className="bg-black/10 p-2 text-neutral-300 transition hover:bg-black/30"
-            onClick={handleReset}
-          >
-            <FontAwesomeIcon icon={faArrowRotateLeft} className="h-4" />
-          </ButtonWithTooltip>
-        </div>
       </div>
     </div>
   );

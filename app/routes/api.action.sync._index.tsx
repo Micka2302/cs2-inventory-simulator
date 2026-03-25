@@ -13,21 +13,14 @@ import {
 import { z } from "zod";
 import { api } from "~/api.server";
 import { requireUser } from "~/auth.server";
-import { ItemEditorAttributes } from "~/components/item-editor";
 import { SyncAction } from "~/data/sync";
-import { middleware } from "~/middleware.server";
+import { middleware } from "~/http.server";
 import {
-  craftAllowKeychains,
-  craftAllowKeychainSeed,
-  craftAllowKeychainX,
-  craftAllowKeychainY,
-  craftAllowKeychainZ,
   craftAllowNametag,
   craftAllowSeed,
   craftAllowStatTrak,
   craftAllowStickerRotation,
   craftAllowStickers,
-  craftAllowStickerSchema,
   craftAllowStickerWear,
   craftAllowStickerX,
   craftAllowStickerY,
@@ -36,17 +29,11 @@ import {
   craftHideId,
   craftHideModel,
   craftHideType,
-  editAllowKeychains,
-  editAllowKeychainSeed,
-  editAllowKeychainX,
-  editAllowKeychainY,
-  editAllowKeychainZ,
   editAllowNametag,
   editAllowSeed,
   editAllowStatTrak,
   editAllowStickerRotation,
   editAllowStickers,
-  editAllowStickerSchema,
   editAllowStickerWear,
   editAllowStickerX,
   editAllowStickerY,
@@ -63,12 +50,9 @@ import {
 } from "~/models/rule.server";
 import { manipulateUserInventory } from "~/models/user.server";
 import { methodNotAllowed } from "~/responses.server";
-import { editInventoryItem } from "~/utils/inventory";
-import { hasKeys } from "~/utils/misc";
 import { nonNegativeInt, teamShape } from "~/utils/shapes";
 import {
   clientInventoryItemShape,
-  itemEditorAttributesShape,
   syncInventoryShape
 } from "~/utils/shapes.server";
 import type { Route } from "./+types/api.action.sync._index";
@@ -154,7 +138,7 @@ const actionShape = z.discriminatedUnion("type", [
   z.object({
     type: z.literal(SyncAction.Edit),
     uid: nonNegativeInt,
-    attributes: itemEditorAttributesShape
+    attributes: clientInventoryItemShape
   }),
   z.object({
     type: z.literal(SyncAction.AddWithSticker),
@@ -195,8 +179,7 @@ async function enforceCraftRulesForStickerAttributes(
     wear,
     rotation,
     x,
-    y,
-    schema
+    y
   }: RecordValue<NonNullable<CS2BaseInventoryItem["stickers"]>>,
   userId: string
 ) {
@@ -212,54 +195,13 @@ async function enforceCraftRulesForStickerAttributes(
   if (y !== undefined) {
     await craftAllowStickerY.for(userId).truthy();
   }
-  if (schema !== undefined) {
-    await craftAllowStickerSchema.for(userId).truthy();
-  }
-}
-
-async function enforceCraftRulesForKeychainAttributes(
-  {
-    seed,
-    x,
-    y,
-    z
-  }: RecordValue<NonNullable<CS2BaseInventoryItem["keychains"]>>,
-  userId: string
-) {
-  if (seed !== undefined) {
-    await craftAllowKeychainSeed.for(userId).truthy();
-  }
-  if (x !== undefined) {
-    await craftAllowKeychainX.for(userId).truthy();
-  }
-  if (y !== undefined) {
-    await craftAllowKeychainY.for(userId).truthy();
-  }
-  if (z !== undefined) {
-    await craftAllowKeychainZ.for(userId).truthy();
-  }
 }
 
 async function enforceCraftRulesForInventoryItem(
-  {
-    keychains,
-    stickers,
-    statTrak,
-    wear,
-    seed,
-    nameTag
-  }: Partial<CS2BaseInventoryItem>,
+  { stickers, statTrak, wear, seed, nameTag }: Partial<CS2BaseInventoryItem>,
   userId: string
 ) {
-  if (keychains !== undefined && hasKeys(keychains)) {
-    await craftAllowKeychains.for(userId).truthy();
-    await craftHideType.for(userId).notContains(CS2ItemType.Keychain);
-    for (const keychain of Object.values(keychains)) {
-      await enforceCraftRulesForItem(keychain.id, userId);
-      await enforceCraftRulesForKeychainAttributes(keychain, userId);
-    }
-  }
-  if (stickers !== undefined && hasKeys(stickers)) {
+  if (stickers !== undefined) {
     await craftAllowStickers.for(userId).truthy();
     await craftHideType.for(userId).notContains(CS2ItemType.Sticker);
     for (const sticker of Object.values(stickers)) {
@@ -298,49 +240,11 @@ async function enforceEditRulesForItem(
   }
 }
 
-async function enforceEditRulesForKeychainAttributes(
-  {
-    seed,
-    x,
-    y,
-    z
-  }: RecordValue<NonNullable<CS2BaseInventoryItem["keychains"]>>,
-  userId: string
-) {
-  if (seed !== undefined) {
-    await editAllowKeychainSeed.for(userId).truthy();
-  }
-  if (x !== undefined) {
-    await editAllowKeychainX.for(userId).truthy();
-  }
-  if (y !== undefined) {
-    await editAllowKeychainY.for(userId).truthy();
-  }
-  if (z !== undefined) {
-    await editAllowKeychainZ.for(userId).truthy();
-  }
-}
-
 async function enforceEditRulesForInventoryItem(
-  {
-    keychains,
-    stickers,
-    statTrak,
-    wear,
-    seed,
-    nameTag
-  }: Partial<ItemEditorAttributes>,
+  { stickers, statTrak, wear, seed, nameTag }: Partial<CS2BaseInventoryItem>,
   userId: string
 ) {
-  if (keychains !== undefined && hasKeys(keychains)) {
-    await editAllowKeychains.for(userId).truthy();
-    await editHideType.for(userId).notContains(CS2ItemType.Keychain);
-    for (const keychain of Object.values(keychains)) {
-      await enforceEditRulesForItem(keychain.id, userId);
-      await enforceEditRulesForKeychainAttributes(keychain, userId);
-    }
-  }
-  if (stickers !== undefined && hasKeys(stickers)) {
+  if (stickers !== undefined) {
     await editAllowStickers.for(userId).truthy();
     await editHideType.for(userId).notContains(CS2ItemType.Sticker);
     for (const sticker of Object.values(stickers)) {
@@ -367,8 +271,7 @@ async function enforceEditRulesForStickerAttributes(
     wear,
     rotation,
     x,
-    y,
-    schema
+    y
   }: RecordValue<NonNullable<CS2BaseInventoryItem["stickers"]>>,
   userId: string
 ) {
@@ -383,9 +286,6 @@ async function enforceEditRulesForStickerAttributes(
   }
   if (y !== undefined) {
     await editAllowStickerY.for(userId).truthy();
-  }
-  if (schema !== undefined) {
-    await editAllowStickerSchema.for(userId).truthy();
   }
 }
 
@@ -492,8 +392,16 @@ export const action = api(async ({ request }: Route.ActionArgs) => {
             break;
           case SyncAction.Edit:
             await inventoryItemAllowEdit.for(userId).truthy();
+            await enforceEditRulesForItem(action.attributes.id, userId);
             await enforceEditRulesForInventoryItem(action.attributes, userId);
-            editInventoryItem(inventory, action.uid, action.attributes);
+            inventory.edit(action.uid, {
+              ...action.attributes,
+              statTrak:
+                action.attributes.statTrak !== undefined
+                  ? (inventory.get(action.uid).statTrak ?? 0)
+                  : undefined,
+              nameTag: action.attributes.nameTag
+            });
             break;
           case SyncAction.AddWithSticker:
             await enforceCraftRulesForItem(action.itemId, userId);

@@ -6,7 +6,6 @@
 import { CS2Economy } from "@ianlucas/cs2-lib";
 import { z } from "zod";
 import {
-  validateKeychainSeed,
   validateStickerOffset,
   validateStickerRotation,
   validateStickerWear
@@ -28,29 +27,6 @@ export const baseInventoryItemProps = {
     .transform((nameTag) => CS2Economy.trimNametag(nameTag))
     .refine((nameTag) => CS2Economy.safeValidateNametag(nameTag))
     .optional(),
-  keychains: z
-    .record(
-      z.string(),
-      z.object({
-        id: nonNegativeInt,
-        seed: positiveInt
-          .optional()
-          .refine((seed) => seed === undefined || validateKeychainSeed(seed)),
-        x: z
-          .number()
-          .optional()
-          .refine((x) => x === undefined || validateStickerOffset(x)),
-        y: z
-          .number()
-          .optional()
-          .refine((y) => y === undefined || validateStickerOffset(y)),
-        z: z
-          .number()
-          .optional()
-          .refine((z) => z === undefined || validateStickerOffset(z))
-      })
-    )
-    .optional(),
   patches: z.record(z.string(), nonNegativeInt).optional(),
   seed: positiveInt.optional(),
   statTrak: z.literal(0).optional(),
@@ -68,7 +44,6 @@ export const baseInventoryItemProps = {
         wear: nonNegativeFloat
           .optional()
           .refine((wear) => wear === undefined || validateStickerWear(wear)),
-        schema: z.number().int().min(0).optional(),
         x: z
           .number()
           .optional()

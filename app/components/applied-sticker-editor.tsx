@@ -3,12 +3,11 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { faArrowRotateLeft, faEye } from "@fortawesome/free-solid-svg-icons";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   CS2_MAX_STICKER_ROTATION,
   CS2_MAX_STICKER_WEAR,
-  CS2_MAX_STICKERS,
   CS2_MIN_STICKER_ROTATION,
   CS2_MIN_STICKER_WEAR,
   CS2_STICKER_WEAR_FACTOR,
@@ -28,12 +27,10 @@ import {
   stickerOffsetStringMaxLen,
   stickerOffsetToString,
   stickerRotationStringMaxLen,
-  stickerSchemaStringMaxLen,
   stickerWearStringMaxLen,
   stickerWearToString,
   validateStickerOffset,
   validateStickerRotation,
-  validateStickerSchema,
   validateStickerWear
 } from "~/utils/economy";
 import { createFakeInventoryItemFromBase } from "~/utils/inventory";
@@ -44,13 +41,11 @@ import { EditorLabel } from "./editor-label";
 import { EditorStepRangeWithInput } from "./editor-step-range-with-input";
 import { useKeyValues } from "./hooks/use-key-values";
 import { useTimedState } from "./hooks/use-timed-state";
-import { confirm } from "./modal-generic";
 
 export function AppliedStickerEditor({
   className,
   forItem,
   isHideStickerRotation,
-  isHideStickerSchema,
   isHideStickerWear,
   isHideStickerX,
   isHideStickerY,
@@ -63,14 +58,12 @@ export function AppliedStickerEditor({
   className?: string;
   forItem?: CS2EconomyItem;
   isHideStickerRotation?: boolean;
-  isHideStickerSchema?: boolean;
   isHideStickerWear?: boolean;
   isHideStickerX?: boolean;
   isHideStickerY?: boolean;
   item: CS2EconomyItem;
   onChange?: (data: {
     rotation: number;
-    schema: number;
     wear: number;
     x: number;
     y: number;
@@ -78,21 +71,9 @@ export function AppliedStickerEditor({
   slot?: number;
   stickers?: Record<
     string,
-    {
-      wear?: number;
-      rotation?: number;
-      schema?: number;
-      x?: number;
-      y?: number;
-    }
+    { wear?: number; rotation?: number; x?: number; y?: number }
   >;
-  value: {
-    wear: number;
-    rotation: number;
-    schema: number;
-    x: number;
-    y: number;
-  };
+  value: { wear: number; rotation: number; x: number; y: number };
 }) {
   const translate = useTranslate();
   const [, copyToClipboard] = useCopyToClipboard();
@@ -126,31 +107,12 @@ export function AppliedStickerEditor({
     }
   }
 
-  async function handleReset() {
-    if (
-      await confirm({
-        titleText: translate("EditorReset"),
-        bodyText: "Do you want to reset the attributes?",
-        cancelText: translate("GenericCancel"),
-        confirmText: translate("GenericYes")
-      })
-    ) {
-      attributes.setValue({
-        rotation: 0,
-        schema: -1,
-        wear: 0,
-        x: 0,
-        y: 0
-      });
-    }
-  }
-
   useEffect(() => {
     onChange?.(attributes.value);
   }, [attributes.value]);
 
   return (
-    <div className={clsx("m-auto text-sm select-none", className)}>
+    <div className={clsx("m-auto select-none", className)}>
       <EditorItemDisplay item={item} wear={attributes.value.wear} />
       <div className="space-y-1.5">
         {!isHideStickerWear && (
@@ -224,32 +186,7 @@ export function AppliedStickerEditor({
             />
           </EditorLabel>
         )}
-        {!isHideStickerSchema && (
-          <EditorLabel label={translate("EditorStickerSchema")}>
-            <EditorStepRangeWithInput
-              emptyValue={-1}
-              inputStyles="w-24 min-w-0"
-              max={(forItem?.getStickerSlotCount() ?? CS2_MAX_STICKERS) - 1}
-              maxLength={stickerSchemaStringMaxLen}
-              min={-1}
-              onChange={attributes.update("schema")}
-              placeholder={translate("EditorStickerSchemaPlaceholder")}
-              step={1}
-              stepRangeStyles="flex-1"
-              type="int"
-              validate={(value) => validateStickerSchema(value, forItem)}
-              value={attributes.value.schema}
-            />
-          </EditorLabel>
-        )}
-        <div className="flex justify-end gap-1">
-          <ButtonWithTooltip
-            tooltip={translate("EditorReset")}
-            className="bg-black/10 p-2 text-neutral-300 transition hover:bg-black/30"
-            onClick={handleReset}
-          >
-            <FontAwesomeIcon icon={faArrowRotateLeft} className="h-4" />
-          </ButtonWithTooltip>
+        <div className="flex justify-end">
           <ButtonWithTooltip
             tooltip={translate(
               copied ? "EditorCopiedToClipboard" : "EditorPreview"

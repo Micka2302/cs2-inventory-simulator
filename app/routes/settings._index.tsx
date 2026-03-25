@@ -26,7 +26,7 @@ import { SettingsLabel } from "~/components/settings-label";
 import { backgrounds } from "~/data/backgrounds";
 import { languages } from "~/data/languages";
 import { SyncAction } from "~/data/sync";
-import { middleware } from "~/middleware.server";
+import { middleware } from "~/http.server";
 import { getMetaTitle } from "~/root-meta";
 import type { Route } from "./+types/settings._index";
 import { ApiActionPreferencesUrl } from "./api.action.preferences._index";
@@ -98,8 +98,8 @@ export default function Settings() {
   }
 
   return (
-    <Modal className="w-135">
-      <ModalHeader title={translate("SettingsHeader")} closeTo="/" />
+    <Modal className="w-[540px]">
+      <ModalHeader title={translate("SettingsHeader")} linkTo="/" />
       <div className="mt-2 space-y-2 px-2">
         <SettingsLabel label={translate("SettingsMasterVolume")}>
           <EditorRange

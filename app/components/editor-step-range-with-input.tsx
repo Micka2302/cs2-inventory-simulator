@@ -7,7 +7,7 @@ import { faRandom } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { randomFloat, randomInt } from "@ianlucas/cs2-lib";
 import clsx from "clsx";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslate } from "./app-context";
 import { EditorInput } from "./editor-input";
 import { EditorStepRange } from "./editor-step-range";
@@ -15,13 +15,11 @@ import { EditorStepRange } from "./editor-step-range";
 export function EditorStepRangeWithInput({
   disabled,
   disabledInputStyles,
-  emptyValue,
   inputStyles,
   max,
   maxLength,
   min,
   onChange,
-  placeholder,
   randomizable,
   step,
   stepRangeStyles,
@@ -32,13 +30,11 @@ export function EditorStepRangeWithInput({
 }: {
   disabled?: boolean;
   disabledInputStyles?: string;
-  emptyValue?: number;
   inputStyles: string;
   max: number;
   maxLength: number;
   min: number;
   onChange: (value: number) => void;
-  placeholder?: string;
   randomizable?: boolean;
   step: number;
   stepRangeStyles: string;
@@ -47,28 +43,13 @@ export function EditorStepRangeWithInput({
   validate: (value: number) => boolean;
   value: number;
 }) {
-  const [text, setText] = useState(
-    emptyValue !== undefined && value === emptyValue ? "" : transform(value)
-  );
+  const [text, setText] = useState(transform(value));
   const translate = useTranslate();
-
-  useEffect(() => {
-    const isEmpty = emptyValue !== undefined && value === emptyValue;
-    if (isEmpty) {
-      if (text !== "") setText("");
-    } else if (Number(text) !== value) {
-      setText(transform(value));
-    }
-  }, [value]);
 
   function handleTextChange({
     target: { value: text }
   }: React.ChangeEvent<HTMLInputElement>) {
     setText(text);
-    if (!text && emptyValue !== undefined) {
-      onChange(emptyValue);
-      return;
-    }
     const value = Number(text);
     if (text && validate(value)) {
       onChange(value);
@@ -76,21 +57,14 @@ export function EditorStepRangeWithInput({
   }
 
   function handleTextBlur() {
-    if (!text && emptyValue !== undefined) {
-      return;
-    }
     if (!text || !validate(Number(text))) {
-      setText(
-        emptyValue !== undefined && value === emptyValue ? "" : transform(value)
-      );
+      setText(transform(value));
     }
   }
 
   function handleChange(value: number) {
     onChange(value);
-    setText(
-      emptyValue !== undefined && value === emptyValue ? "" : transform(value)
-    );
+    setText(transform(value));
   }
 
   function handleRandomClick() {
@@ -109,10 +83,7 @@ export function EditorStepRangeWithInput({
         maxLength={maxLength}
         onChange={handleTextChange}
         onBlur={handleTextBlur}
-        placeholder={placeholder}
-        validate={(wearText) =>
-          (!wearText && emptyValue !== undefined) || validate(Number(wearText))
-        }
+        validate={(wearText) => validate(Number(wearText))}
         value={text}
       />
       {!disabled && (
