@@ -5,12 +5,13 @@
 
 generator client {
   provider = "prisma-client"
-  previewFeatures = ["fullTextSearchPostgres"]
+  //previewFeatures = ["fullTextSearchPostgres"]
   output = "../app/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
+  //url      = env("DATABASE_URL")
 }
 
 model User {
@@ -20,7 +21,7 @@ model User {
   createdAt DateTime @default(now())
   groups UserGroup[]
   id String @id
-  inventory String?
+  inventory String? @db.LongText
   name String
   overwrites UserRule[]
   preferences UserPreference?
@@ -31,7 +32,7 @@ model User {
 model UserCache {
   @@id([url, userId])
   args String?
-  body String
+  body String @db.LongText
   timestamp DateTime
   url String
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
